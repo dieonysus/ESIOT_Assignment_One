@@ -23,6 +23,7 @@ void setup() {
   randomSeed(analogRead(0));
   int randomNum = random(16);
   lcd.print(randomNum, DEC);
+  //current value of potentiometer
   currentValue = 0;
 
   for (int i = 0; i < 4; i++) {
@@ -33,9 +34,14 @@ void setup() {
 }
 
 void loop() {
+  //read new potentiometer value from analog pin
   newValue = analogRead(A0);
+  //compare if new value is different from the previous
   if(newValue != currentValue){
+    //assign new value
     currentValue = newValue;
+    //assigns the difficulty level according to potentiometer values
+    //if new difficulty is same as previous it DOES NOT print it again (&& difficulty != x)
     if(currentValue >= 0 && currentValue <= 256 && difficulty != 1){
       Serial.println("EASY :)");
       difficulty = 1;
