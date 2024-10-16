@@ -12,18 +12,19 @@ bool ledStates[] = {LOW, LOW, LOW, LOW};
 
 //variables needed for level selector (potentiometer)
 int currentValue;
-int difficulty;
 int newValue;
+int difficulty;
+
+bool isGameStarted = false;
+bool shouldDisplayNumber = true;
+
 
 void setup() {
-  // put your setup code here, to run once:
+  Serial.begin(9600);
   lcd.init();
   lcd.backlight();
-  Serial.begin(9600);
   randomSeed(analogRead(0));
-  int randomNum = random(16);
-  lcd.print(randomNum, DEC);
-  //current value of potentiometer
+  
   currentValue = 0;
 
   for (int i = 0; i < 4; i++) {
@@ -34,8 +35,30 @@ void setup() {
 }
 
 void loop() {
-  //read new potentiometer value from analog pin
-  newValue = analogRead(A0);
+  if (!isGameStarted) {
+    chooseDifficulty();
+    bool startButtonState = digitalRead(BUTTONS[0]);
+    if (startButtonState) {
+      isGameStarted = true;
+    }
+  } 
+  else {
+    if (shouldDisplayNumber) {
+      int randomNum = random(1, 16);
+      lcd.print(randomNum, DEC);
+      shouldDisplayNumber = false;
+    } else {
+      for (int i = 0; i < 4; i++) {
+        handle_button(BUTTONS[i], LEDS[i], i);
+      }
+    }
+  }
+}
+
+
+void chooseDifficulty() {
+    //read new potentiometer value from analog pin
+  newValue = analogRead(A1);
   //compare if new value is different from the previous
   if(newValue != currentValue){
     //assign new value
@@ -46,26 +69,16 @@ void loop() {
       Serial.println("EASY :)");
       difficulty = 1;
     }else if(currentValue > 256 && currentValue <= 512 && difficulty != 2){
-      
-      Serial.println("MEDIUM ;)");
+      Serial.println("MEDIUM :|");
       difficulty = 2;
-      
     }else if(currentValue > 512 && currentValue <= 768 && difficulty != 3){
-      
-      Serial.println("HARD!");
+      Serial.println("HARD >:)");
       difficulty = 3;
-      
     }else if(currentValue > 768 && difficulty != 4){
-      Serial.println("EXPERT!!!");
+      Serial.println("EXPERT >:D");
       difficulty = 4;
     }
-    
-     
   }
-  for (int i = 0; i < 4; i++) {
-    handle_button(BUTTONS[i], LEDS[i], i);
-  }
-
 }
 
 
