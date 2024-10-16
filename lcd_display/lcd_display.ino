@@ -24,7 +24,7 @@ void setup() {
   lcd.init();
   lcd.backlight();
   randomSeed(analogRead(0));
-
+  
   currentValue = 0;
 
   for (int i = 0; i < 4; i++) {
@@ -53,7 +53,6 @@ void loop() {
       }
     }
   }
-
 }
 
 
