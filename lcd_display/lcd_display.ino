@@ -1,7 +1,7 @@
 #include <LiquidCrystal_I2C.h>
 #include <Wire.h>
 
-#define DEBOUNCE_TIME 150
+#define DEBOUNCE_TIME 200
 
 LiquidCrystal_I2C lcd(0x27, 16, 2);
 
@@ -17,6 +17,7 @@ int difficulty;
 
 bool isGameStarted = false;
 bool shouldDisplayNumber = true;
+int randomNum = 0;
 
 
 void setup() {
@@ -24,7 +25,7 @@ void setup() {
   lcd.init();
   lcd.backlight();
   randomSeed(analogRead(0));
-  
+
   currentValue = 0;
 
   for (int i = 0; i < 4; i++) {
@@ -40,16 +41,20 @@ void loop() {
     bool startButtonState = digitalRead(BUTTONS[0]);
     if (startButtonState) {
       isGameStarted = true;
+      delay(1000);
     }
   } 
   else {
     if (shouldDisplayNumber) {
-      int randomNum = random(1, 16);
+      randomNum = random(1, 16);
       lcd.print(randomNum, DEC);
       shouldDisplayNumber = false;
     } else {
       for (int i = 0; i < 4; i++) {
         handle_button(BUTTONS[i], LEDS[i], i);
+        if (randomNum == convertButtonsToDecimal()) {
+          shouldDisplayNumber = true;
+        }
       }
     }
   }
@@ -92,4 +97,13 @@ void handle_button(int BUTTON, int LED, int i) {
       prevts[i] = ts;
     }
   }
+}
+
+
+int convertButtonsToDecimal() {
+  int decimal = 0;
+  for (int i = 0; i < 4; i++) {
+    decimal += ledStates[i] << (i);
+  }
+  return decimal;
 }
