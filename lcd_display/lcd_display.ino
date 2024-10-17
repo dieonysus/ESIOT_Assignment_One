@@ -7,17 +7,15 @@ LiquidCrystal_I2C lcd(0x27, 16, 2);
 
 const int BUTTONS[] = {2, 3, 4, 5};
 const int LEDS[] = {8, 9, 10, 11};
-long prevts[4];
 bool ledStates[] = {LOW, LOW, LOW, LOW};
+long prevButtonPressTime[4];
 
-//variables needed for level selector (potentiometer)
-int currentValue;
-int newValue;
-int difficulty;
+int currentPotValue = 0;
+int difficulty = 1;
 
 bool isGameStarted = false;
 bool shouldDisplayNumber = true;
-int randomNum = 0;
+int targetNumber = 0;
 
 
 void setup() {
@@ -26,60 +24,40 @@ void setup() {
   lcd.backlight();
   randomSeed(analogRead(0));
 
-  currentValue = 0;
-
   for (int i = 0; i < 4; i++) {
     pinMode(BUTTONS[i], INPUT);
     pinMode(LEDS[i], OUTPUT);
-    prevts[i] = 0;
+    prevButtonPressTime[i] = 0;
   }
 }
 
 void loop() {
   if (!isGameStarted) {
-    chooseDifficulty();
-    bool startButtonState = digitalRead(BUTTONS[0]);
-    if (startButtonState) {
-      isGameStarted = true;
-      delay(1000);
+    selectDifficulty();
+    if (digitalRead(BUTTONS[0])) {
+      startGame();
     }
   } 
   else {
-    if (shouldDisplayNumber) {
-      randomNum = random(1, 16);
-      lcd.print(randomNum, DEC);
-      shouldDisplayNumber = false;
-    } else {
-      for (int i = 0; i < 4; i++) {
-        handle_button(BUTTONS[i], LEDS[i], i);
-        if (randomNum == convertButtonsToDecimal()) {
-          shouldDisplayNumber = true;
-        }
-      }
-    }
+    playGame();
   }
 }
 
 
-void chooseDifficulty() {
-    //read new potentiometer value from analog pin
-  newValue = analogRead(A1);
-  //compare if new value is different from the previous
-  if(newValue != currentValue){
-    //assign new value
-    currentValue = newValue;
-    //assigns the difficulty level according to potentiometer values
-    //if new difficulty is same as previous it DOES NOT print it again (&& difficulty != x)
-    if(currentValue >= 0 && currentValue <= 256 && difficulty != 1){
+void selectDifficulty() {
+  int newPotValue = analogRead(A1);
+  if(currentPotValue != newPotValue){
+    currentPotValue = newPotValue;
+    if(currentPotValue >= 0 && currentPotValue <= 256 && difficulty != 1){
       Serial.println("EASY :)");
       difficulty = 1;
-    }else if(currentValue > 256 && currentValue <= 512 && difficulty != 2){
+    }else if(currentPotValue > 256 && currentPotValue <= 512 && difficulty != 2){
       Serial.println("MEDIUM :|");
       difficulty = 2;
-    }else if(currentValue > 512 && currentValue <= 768 && difficulty != 3){
+    }else if(currentPotValue > 512 && currentPotValue <= 768 && difficulty != 3){
       Serial.println("HARD >:)");
       difficulty = 3;
-    }else if(currentValue > 768 && difficulty != 4){
+    }else if(currentPotValue > 768 && difficulty != 4){
       Serial.println("EXPERT >:D");
       difficulty = 4;
     }
@@ -87,20 +65,40 @@ void chooseDifficulty() {
 }
 
 
-void handle_button(int BUTTON, int LED, int i) {
-  int button_state = digitalRead(BUTTON);
-  long ts = millis();
-  if (ts - prevts[i] > DEBOUNCE_TIME) {
-    if (button_state == HIGH) {
-      ledStates[i] = !ledStates[i];
-      digitalWrite(LED, ledStates[i]);
-      prevts[i] = ts;
+void startGame() {
+  isGameStarted = true;
+  delay(1000);
+}
+
+
+void playGame() {
+  if (shouldDisplayNumber) {
+    targetNumber = random(1, 16);
+    lcd.print(targetNumber, DEC);
+    shouldDisplayNumber = false;
+  } else {
+    handleButtonPresses();
+    if (targetNumber == getButtonStatesAsDecimal()) {
+      shouldDisplayNumber = true;
     }
   }
 }
 
 
-int convertButtonsToDecimal() {
+void handleButtonPresses() {
+  for (int i = 0; i < 4; i++) {
+    int buttonState = digitalRead(BUTTONS[i]);
+    long currentTime = millis();
+    if (buttonState == HIGH && currentTime - prevButtonPressTime[i] > DEBOUNCE_TIME) {
+      ledStates[i] = !ledStates[i];
+      digitalWrite(LEDS[i], ledStates[i]);
+      prevButtonPressTime[i] = currentTime;
+    }
+  }
+}
+
+
+int getButtonStatesAsDecimal() {
   int decimal = 0;
   for (int i = 0; i < 4; i++) {
     decimal += ledStates[i] << (i);
