@@ -17,7 +17,6 @@ bool isGameStarted = false;
 bool shouldDisplayNumber = true;
 int targetNumber = 0;
 
-
 void setup() {
   Serial.begin(9600);
   lcd.init();
@@ -49,16 +48,20 @@ void selectDifficulty() {
   if(currentPotValue != newPotValue){
     currentPotValue = newPotValue;
     if(currentPotValue >= 0 && currentPotValue <= 256 && difficulty != 1){
-      Serial.println("EASY :)");
+      lcd.clear();
+      lcd.print(" :) EASY");
       difficulty = 1;
     }else if(currentPotValue > 256 && currentPotValue <= 512 && difficulty != 2){
-      Serial.println("MEDIUM :|");
+      lcd.clear();
+      lcd.print(" :| MEDIUM");
       difficulty = 2;
     }else if(currentPotValue > 512 && currentPotValue <= 768 && difficulty != 3){
-      Serial.println("HARD >:)");
+      lcd.clear();
+      lcd.print(">:) HARD");
       difficulty = 3;
     }else if(currentPotValue > 768 && difficulty != 4){
-      Serial.println("EXPERT >:D");
+      lcd.clear();
+      lcd.print(">:D EXPERT");
       difficulty = 4;
     }
   }
