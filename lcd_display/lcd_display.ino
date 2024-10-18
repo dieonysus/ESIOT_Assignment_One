@@ -105,7 +105,9 @@ void playGame() {
     lcd.clear();
     lcd.print(targetNumber, DEC);
     shouldDisplayNumber = false;
+    time_started = millis();
   } else {
+    no_more_time();
     handleButtonPresses();
     if (targetNumber == getButtonStatesAsDecimal()) {
       shouldDisplayNumber = true;
@@ -154,4 +156,16 @@ void finishGame() {
   isDifficultySelected = false;
   isGameStarted = false;
   isGameOver = false;
+}
+
+void no_more_time(){
+  deltaT = (millis() - time_started)/1000 ;
+  
+  if(currentDelta != deltaT){
+    Serial.println(5 - currentDelta);
+  }
+  currentDelta = deltaT;
+  if(currentDelta > 5){
+    finishGame();
+  }
 }
