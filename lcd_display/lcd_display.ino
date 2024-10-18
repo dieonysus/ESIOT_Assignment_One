@@ -13,8 +13,8 @@ const int LEDS[] = {8, 9, 10, 11};
 bool ledStates[] = {LOW, LOW, LOW, LOW};
 long prevButtonPressTime[4];
 
-int currentPotValue = 0;
-int difficulty = 1;
+int currentPotValue;
+int difficulty;
 
 bool isIntroDisplayed = false;
 bool isDifficultySelected = false;
@@ -156,11 +156,16 @@ void finishGame() {
   isDifficultySelected = false;
   isGameStarted = false;
   isGameOver = false;
+  time_started = 0;
+  deltaT = 0;
+  currentDelta = 0;
+  difficulty = 0;
+  currentPotValue = 0;
+  shouldDisplayNumber = true;
 }
 
 void no_more_time(){
   deltaT = (millis() - time_started)/1000 ;
-  
   if(currentDelta != deltaT){
     Serial.println(5 - currentDelta);
   }
