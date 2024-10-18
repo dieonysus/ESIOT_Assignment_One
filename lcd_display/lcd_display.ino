@@ -77,12 +77,14 @@ void startGame() {
 void playGame() {
   if (shouldDisplayNumber) {
     targetNumber = random(1, 16);
+    lcd.clear();
     lcd.print(targetNumber, DEC);
     shouldDisplayNumber = false;
   } else {
     handleButtonPresses();
     if (targetNumber == getButtonStatesAsDecimal()) {
       shouldDisplayNumber = true;
+      turnOffAllLeds();
     }
   }
 }
@@ -107,4 +109,12 @@ int getButtonStatesAsDecimal() {
     decimal += ledStates[i] << (i);
   }
   return decimal;
+}
+
+
+void turnOffAllLeds() {
+  for (int i = 0; i < 4; i++) {
+    ledStates[i] = LOW;
+    digitalWrite(LEDS[i], ledStates[i]);
+  }
 }
