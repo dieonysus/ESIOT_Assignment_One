@@ -13,6 +13,7 @@ long prevButtonPressTime[4];
 int currentPotValue = 0;
 int difficulty = 1;
 
+bool isIntroDisplayed = false;
 bool isDifficultySelected = false;
 bool isGameStarted = false;
 bool isGameOver = false;
@@ -34,7 +35,10 @@ void setup() {
 }
 
 void loop() {
-  if (!isDifficultySelected) {
+  if (!isIntroDisplayed) {
+    displayIntro();
+  }
+  else if (!isDifficultySelected) {
     selectDifficulty();
   } 
   else if (!isGameStarted) {
@@ -46,6 +50,13 @@ void loop() {
   else {
     finishGame();
   }
+}
+
+
+void displayIntro() {
+  lcd.clear();
+  lcd.print("Difficulty");
+  isIntroDisplayed = true;
 }
 
 
@@ -132,5 +143,12 @@ void turnOffAllLeds() {
 
 
 void finishGame() {
-
+  lcd.clear();
+  lcd.print("Game over!");
+  delay(1000);
+  lcd.clear();
+  isIntroDisplayed = false;
+  isDifficultySelected = false;
+  isGameStarted = false;
+  isGameOver = false;
 }
