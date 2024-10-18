@@ -13,7 +13,10 @@ long prevButtonPressTime[4];
 int currentPotValue = 0;
 int difficulty = 1;
 
+bool isDifficultySelected = false;
 bool isGameStarted = false;
+bool isGameOver = false;
+
 bool shouldDisplayNumber = true;
 int targetNumber = 0;
 
@@ -31,14 +34,17 @@ void setup() {
 }
 
 void loop() {
-  if (!isGameStarted) {
+  if (!isDifficultySelected) {
     selectDifficulty();
-    if (digitalRead(BUTTONS[0])) {
-      startGame();
-    }
+  } 
+  else if (!isGameStarted) {
+    startGame();
+  } 
+  else if (!isGameOver) {
+    playGame();
   } 
   else {
-    playGame();
+    finishGame();
   }
 }
 
@@ -65,11 +71,16 @@ void selectDifficulty() {
       difficulty = 4;
     }
   }
+  if (digitalRead(BUTTONS[0])) {
+    isDifficultySelected = true;
+  }
 }
 
 
 void startGame() {
   isGameStarted = true;
+  lcd.clear();
+  lcd.print("Get ready!");
   delay(1000);
 }
 
@@ -117,4 +128,9 @@ void turnOffAllLeds() {
     ledStates[i] = LOW;
     digitalWrite(LEDS[i], ledStates[i]);
   }
+}
+
+
+void finishGame() {
+
 }
