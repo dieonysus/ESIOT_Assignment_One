@@ -4,6 +4,9 @@
 #define DEBOUNCE_TIME 200
 
 LiquidCrystal_I2C lcd(0x27, 16, 2);
+unsigned long time_started = 0;
+int deltaT;
+int currentDelta;
 
 const int BUTTONS[] = {2, 3, 4, 5};
 const int LEDS[] = {8, 9, 10, 11};
@@ -102,7 +105,9 @@ void playGame() {
     lcd.clear();
     lcd.print(targetNumber, DEC);
     shouldDisplayNumber = false;
+    time_started = millis();
   } else {
+    no_more_time();
     handleButtonPresses();
     if (targetNumber == getButtonStatesAsDecimal()) {
       shouldDisplayNumber = true;
@@ -151,4 +156,16 @@ void finishGame() {
   isDifficultySelected = false;
   isGameStarted = false;
   isGameOver = false;
+}
+
+void no_more_time(){
+  deltaT = (millis() - time_started)/1000 ;
+  
+  if(currentDelta != deltaT){
+    Serial.println(5 - currentDelta);
+  }
+  currentDelta = deltaT;
+  if(currentDelta > 5){
+    finishGame();
+  }
 }
