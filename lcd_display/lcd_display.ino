@@ -66,7 +66,9 @@ void loop() {
 
 void displayIntro() {
   lcd.clear();
-  lcd.print("Difficulty");
+  lcd.print("Welcome to GMB!");
+  lcd.setCursor(0, 1);
+  lcd.print("Press B1 to Start");
   isIntroDisplayed = true;
 }
 
