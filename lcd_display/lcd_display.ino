@@ -5,9 +5,9 @@
 
 LiquidCrystal_I2C lcd(0x27, 16, 2);
 unsigned long time_started = 0;
-int deltaT;
-int currentDelta;
-int time;
+int deltaT = 0;
+int currentDelta = 0;
+int time = 15;
 
 const int REDLED = 13;
 bool redLedState = LOW;
@@ -19,8 +19,8 @@ const int LEDS[] = {8, 9, 10, 11};
 bool ledStates[] = {LOW, LOW, LOW, LOW};
 long prevButtonPressTime[4];
 
-int currentPotValue;
-int difficulty;
+int currentPotValue = 1;
+int difficulty = 0;
 
 bool isIntroDisplayed = false;
 bool isDifficultySelected = false;
@@ -86,22 +86,30 @@ void selectDifficulty() {
   if(currentPotValue != newPotValue){
     currentPotValue = newPotValue;
     if(currentPotValue >= 0 && currentPotValue <= 256 && difficulty != 1){
-      lcd.clear();
+      lcd.setCursor(0,1);
+      lcd.print("          ");
+      lcd.setCursor(0,1);
       lcd.print(" :) EASY");
       difficulty = 1;
-      time = 15;
+      time = 15
     }else if(currentPotValue > 256 && currentPotValue <= 512 && difficulty != 2){
-      lcd.clear();
+      lcd.setCursor(0,1);
+      lcd.print("          ");
+      lcd.setCursor(0,1);
       lcd.print(" :| MEDIUM");
       difficulty = 2;
       time = 10;
     }else if(currentPotValue > 512 && currentPotValue <= 768 && difficulty != 3){
-      lcd.clear();
+      lcd.setCursor(0,1);
+      lcd.print("          ");
+      lcd.setCursor(0,1);
       lcd.print(">:) HARD");
       difficulty = 3;
       time = 7;
     }else if(currentPotValue > 768 && difficulty != 4){
-      lcd.clear();
+      lcd.setCursor(0,1);
+      lcd.print("          ");
+      lcd.setCursor(0,1);
       lcd.print(">:D EXPERT");
       difficulty = 4;
       time = 5;
@@ -137,6 +145,8 @@ void playGame() {
       shouldDisplayNumber = true;
       turnOffAllLeds();
       time = time - (time*0.05);
+      deltaT = 0;
+      currentDelta = 0;
     }
   }
 }
