@@ -7,6 +7,7 @@ LiquidCrystal_I2C lcd(0x27, 16, 2);
 unsigned long time_started = 0;
 int deltaT;
 int currentDelta;
+int time;
 
 const int BUTTONS[] = {2, 3, 4, 5};
 const int LEDS[] = {8, 9, 10, 11};
@@ -71,18 +72,22 @@ void selectDifficulty() {
       lcd.clear();
       lcd.print(" :) EASY");
       difficulty = 1;
+      time = 15;
     }else if(currentPotValue > 256 && currentPotValue <= 512 && difficulty != 2){
       lcd.clear();
       lcd.print(" :| MEDIUM");
       difficulty = 2;
+      time = 10;
     }else if(currentPotValue > 512 && currentPotValue <= 768 && difficulty != 3){
       lcd.clear();
       lcd.print(">:) HARD");
       difficulty = 3;
+      time = 7;
     }else if(currentPotValue > 768 && difficulty != 4){
       lcd.clear();
       lcd.print(">:D EXPERT");
       difficulty = 4;
+      time = 5;
     }
   }
   if (digitalRead(BUTTONS[0])) {
@@ -112,6 +117,7 @@ void playGame() {
     if (targetNumber == getButtonStatesAsDecimal()) {
       shouldDisplayNumber = true;
       turnOffAllLeds();
+      time = time - (time*0.05);
     }
   }
 }
@@ -162,15 +168,21 @@ void finishGame() {
   difficulty = 0;
   currentPotValue = 0;
   shouldDisplayNumber = true;
+  turnOffAllLeds();
 }
 
 void no_more_time(){
   deltaT = (millis() - time_started)/1000 ;
-  if(currentDelta != deltaT){
-    Serial.println(5 - currentDelta);
+ if(currentDelta != deltaT){
+    lcd.setCursor(8,0);
+    lcd.print("Time:");
+    lcd.setCursor(13,0);
+    lcd.print("  ");
+    lcd.setCursor(13,0);
+    lcd.print(time - currentDelta);
   }
   currentDelta = deltaT;
-  if(currentDelta > 5){
+  if(currentDelta > time){
     finishGame();
   }
 }
