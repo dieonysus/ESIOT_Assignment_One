@@ -9,6 +9,11 @@ int deltaT;
 int currentDelta;
 int time;
 
+const int REDLED = 13;
+bool redLedState = LOW;
+long prevRedLedBlinkTime = 0;
+long redLedBlinkInterval = 500;
+
 const int BUTTONS[] = {2, 3, 4, 5};
 const int LEDS[] = {8, 9, 10, 11};
 bool ledStates[] = {LOW, LOW, LOW, LOW};
@@ -36,6 +41,8 @@ void setup() {
     pinMode(LEDS[i], OUTPUT);
     prevButtonPressTime[i] = 0;
   }
+
+  pinMode(REDLED, OUTPUT);
 }
 
 void loop() {
@@ -65,6 +72,14 @@ void displayIntro() {
 
 
 void selectDifficulty() {
+  long currentRedLedTime = millis();
+  if (currentRedLedTime - prevRedLedBlinkTime >= redLedBlinkInterval) {
+    prevRedLedBlinkTime = currentRedLedTime;
+    redLedState = !redLedState;
+    digitalWrite(REDLED, redLedState);
+  }
+
+
   int newPotValue = analogRead(A1);
   if(currentPotValue != newPotValue){
     currentPotValue = newPotValue;
@@ -92,6 +107,8 @@ void selectDifficulty() {
   }
   if (digitalRead(BUTTONS[0])) {
     isDifficultySelected = true;
+    redLedState = LOW;
+    digitalWrite(REDLED, redLedState);
   }
 }
 
@@ -156,6 +173,8 @@ void turnOffAllLeds() {
 void finishGame() {
   lcd.clear();
   lcd.print("Game over!");
+  redLedState = HIGH;
+  digitalWrite(REDLED, redLedState);
   delay(1000);
   lcd.clear();
   isIntroDisplayed = false;
@@ -172,7 +191,7 @@ void finishGame() {
 }
 
 void no_more_time(){
-  deltaT = (millis() - time_started)/1000 ;
+deltaT = (millis() - time_started)/1000 ;
  if(currentDelta != deltaT){
     lcd.setCursor(8,0);
     lcd.print("Time:");
