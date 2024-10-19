@@ -67,8 +67,6 @@ void loop() {
 void displayIntro() {
   lcd.clear();
   lcd.print("Welcome to GMB!");
-  lcd.setCursor(0, 1);
-  lcd.print("Press B1 to Start");
   isIntroDisplayed = true;
 }
 
@@ -91,7 +89,7 @@ void selectDifficulty() {
       lcd.setCursor(0,1);
       lcd.print(" :) EASY");
       difficulty = 1;
-      time = 15
+      time = 15;
     }else if(currentPotValue > 256 && currentPotValue <= 512 && difficulty != 2){
       lcd.setCursor(0,1);
       lcd.print("          ");
