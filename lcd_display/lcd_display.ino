@@ -1,19 +1,24 @@
+#include <avr/sleep.h>
 #include <LiquidCrystal_I2C.h>
 #include <Wire.h>
 
 #define DEBOUNCE_TIME 200
-#define LED_BLINK_INTERVAL 500
 
 LiquidCrystal_I2C lcd(0x27, 16, 2);
+unsigned long time_started = 0;
+int deltaT = 0;
+int currentDelta = 0;
+int time = 15;
 
 const int REDLED = 13;
 bool redLedState = LOW;
-long previousRedLedBlinkTime = 0;
+long prevRedLedBlinkTime = 0;
+long redLedBlinkInterval = 500;
 
 const int BUTTONS[] = {2, 3, 4, 5};
 const int LEDS[] = {8, 9, 10, 11};
 bool ledStates[] = {LOW, LOW, LOW, LOW};
-long previousButtonPressTime[4];
+long prevButtonPressTime[4];
 
 int currentPotValue = 1;
 int difficulty = 0;
@@ -26,11 +31,6 @@ bool isGameOver = false;
 bool shouldDisplayNumber = true;
 int targetNumber = 0;
 
-unsigned long timeRoundStart = 0;
-int deltaT = 0;
-int currentDelta = 0;
-int time = 15;
-
 void setup() {
   Serial.begin(9600);
   lcd.init();
@@ -40,7 +40,7 @@ void setup() {
   for (int i = 0; i < 4; i++) {
     pinMode(BUTTONS[i], INPUT);
     pinMode(LEDS[i], OUTPUT);
-    previousButtonPressTime[i] = 0;
+    prevButtonPressTime[i] = 0;
   }
 
   pinMode(REDLED, OUTPUT);
@@ -49,13 +49,17 @@ void setup() {
 void loop() {
   if (!isIntroDisplayed) {
     displayIntro();
-  } else if (!isDifficultySelected) {
+  }
+  else if (!isDifficultySelected) {
     selectDifficulty();
-  } else if (!isGameStarted) {
+  } 
+  else if (!isGameStarted) {
     startGame();
-  } else if (!isGameOver) {
+  } 
+  else if (!isGameOver) {
     playGame();
-  } else {
+  } 
+  else {
     finishGame();
   }
 }
@@ -69,7 +73,13 @@ void displayIntro() {
 
 
 void selectDifficulty() {
-  blinkRedLed();
+  long currentRedLedTime = millis();
+  if (currentRedLedTime - prevRedLedBlinkTime >= redLedBlinkInterval) {
+    prevRedLedBlinkTime = currentRedLedTime;
+    redLedState = !redLedState;
+    digitalWrite(REDLED, redLedState);
+  }
+
 
   int newPotValue = analogRead(A1);
   if(currentPotValue != newPotValue){
@@ -112,16 +122,6 @@ void selectDifficulty() {
 }
 
 
-void blinkRedLed() {
-  long currentRedLedTime = millis();
-  if (currentRedLedTime - previousRedLedBlinkTime >= LED_BLINK_INTERVAL) {
-    previousRedLedBlinkTime = currentRedLedTime;
-    redLedState = !redLedState;
-    digitalWrite(REDLED, redLedState);
-  }
-}
-
-
 void startGame() {
   isGameStarted = true;
   lcd.clear();
@@ -136,11 +136,11 @@ void playGame() {
     lcd.clear();
     lcd.print(targetNumber, DEC);
     shouldDisplayNumber = false;
-    timeRoundStart = millis();
+    time_started = millis();
   } else {
     no_more_time();
     handleButtonPresses();
-    if (targetNumber == convertButtonsStatesToDecimal()) {
+    if (targetNumber == getButtonStatesAsDecimal()) {
       shouldDisplayNumber = true;
       turnOffAllLeds();
       time = time - (time*0.05);
@@ -155,16 +155,16 @@ void handleButtonPresses() {
   for (int i = 0; i < 4; i++) {
     int buttonState = digitalRead(BUTTONS[i]);
     long currentTime = millis();
-    if (buttonState == HIGH && currentTime - previousButtonPressTime[i] > DEBOUNCE_TIME) {
+    if (buttonState == HIGH && currentTime - prevButtonPressTime[i] > DEBOUNCE_TIME) {
       ledStates[i] = !ledStates[i];
       digitalWrite(LEDS[i], ledStates[i]);
-      previousButtonPressTime[i] = currentTime;
+      prevButtonPressTime[i] = currentTime;
     }
   }
 }
 
 
-int convertButtonsStatesToDecimal() {
+int getButtonStatesAsDecimal() {
   int decimal = 0;
   for (int i = 0; i < 4; i++) {
     decimal += ledStates[i] << (i);
@@ -176,7 +176,7 @@ int convertButtonsStatesToDecimal() {
 void turnOffAllLeds() {
   for (int i = 0; i < 4; i++) {
     ledStates[i] = LOW;
-    digitalWrite(LEDS[i], LOW);
+    digitalWrite(LEDS[i], ledStates[i]);
   }
 }
 
@@ -184,19 +184,15 @@ void turnOffAllLeds() {
 void finishGame() {
   lcd.clear();
   lcd.print("Game over!");
-  digitalWrite(REDLED, HIGH);
+  redLedState = HIGH;
+  digitalWrite(REDLED, redLedState);
   delay(1000);
-  resetGame();
-}
-
-
-void resetGame() {
   lcd.clear();
   isIntroDisplayed = false;
   isDifficultySelected = false;
   isGameStarted = false;
   isGameOver = false;
-  timeRoundStart = 0;
+  time_started = 0;
   deltaT = 0;
   currentDelta = 0;
   difficulty = 0;
@@ -205,9 +201,8 @@ void resetGame() {
   turnOffAllLeds();
 }
 
-
 void no_more_time(){
-deltaT = (millis() - timeRoundStart)/1000 ;
+deltaT = (millis() - time_started)/1000 ;
  if(currentDelta != deltaT){
     lcd.setCursor(8,0);
     lcd.print("Time:");
