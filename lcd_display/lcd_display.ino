@@ -1,10 +1,11 @@
 #include <LiquidCrystal_I2C.h>
 #include <Wire.h>
 #include <avr/sleep.h>
+#include <EnableInterrupt.h>
 
 #define DEBOUNCE_TIME 200
 #define LED_BLINK_INTERVAL 500
-#define WAKE_UP_TIME 10000
+#define WAKE_UP_TIME 3000
 
 LiquidCrystal_I2C lcd(0x27, 16, 2);
 
@@ -12,7 +13,7 @@ const int REDLED = 13;
 bool redLedState = LOW;
 long previousRedLedBlinkTime = 0;
 
-const int BUTTONS[] = {2, 3, 4, 5};
+const int BUTTONS[] = {2, 3, 4, 7};
 const int LEDS[] = {8, 9, 10, 11};
 bool ledStates[] = {LOW, LOW, LOW, LOW};
 long previousButtonPressTime[4];
@@ -47,9 +48,9 @@ void setup() {
     pinMode(BUTTONS[i], INPUT);
     pinMode(LEDS[i], OUTPUT);
     previousButtonPressTime[i] = 0;
+    enableInterrupt(BUTTONS[i], wakeUp, RISING);
   }
   pinMode(REDLED, OUTPUT);
-  attachInterrupt(digitalPinToInterrupt(2), wakeUp, RISING);
   lastActivityTime = millis();
 }
 
@@ -86,7 +87,8 @@ void checkInactivity() {
 
 
 void goToSleepMode() {
-  lcd.print("Sleeping...")
+  lcd.clear();
+  lcd.print("Sleeping...");
   Serial.flush();
   delay(1000);
   set_sleep_mode(SLEEP_MODE_PWR_DOWN);
@@ -96,6 +98,8 @@ void goToSleepMode() {
   Serial.println("WAKE UP");
   sleep_disable();
   lastActivityTime = millis();
+  displayIntro();
+  delay(1000);
 }
 
 
@@ -105,8 +109,8 @@ void selectDifficulty() {
   int newPotValue = analogRead(A1);
   if(currentPotValue != newPotValue){
     currentPotValue = newPotValue;
-    lactActivityTime = millis();
     if(currentPotValue >= 0 && currentPotValue <= 256 && difficulty != 1){
+      lastActivityTime = millis();
       lcd.setCursor(0,2);
       lcd.print("          ");
       lcd.setCursor(0,2);
@@ -114,6 +118,7 @@ void selectDifficulty() {
       difficulty = 1;
       time = 15;
     }else if(currentPotValue > 256 && currentPotValue <= 512 && difficulty != 2){
+      lastActivityTime = millis();
       lcd.setCursor(0,2);
       lcd.print("          ");
       lcd.setCursor(0,2);
@@ -121,6 +126,7 @@ void selectDifficulty() {
       difficulty = 2;
       time = 10;
     }else if(currentPotValue > 512 && currentPotValue <= 768 && difficulty != 3){
+      lastActivityTime = millis();
       lcd.setCursor(0,2);
       lcd.print("          ");
       lcd.setCursor(0,2);
@@ -128,6 +134,7 @@ void selectDifficulty() {
       difficulty = 3;
       time = 7;
     }else if(currentPotValue > 768 && difficulty != 4){
+      lastActivityTime = millis();
       lcd.setCursor(0,2);
       lcd.print("          ");
       lcd.setCursor(0,2);
@@ -239,6 +246,7 @@ void resetGame() {
   currentPotValue = 0;
   shouldDisplayNumber = true;
   turnOffAllLeds();
+  lastActivityTime = millis();
 }
 
 
