@@ -1,8 +1,10 @@
 #include <LiquidCrystal_I2C.h>
 #include <Wire.h>
+#include <avr/sleep.h>
 
 #define DEBOUNCE_TIME 200
 #define LED_BLINK_INTERVAL 500
+#define WAKE_UP_TIME 10000
 
 LiquidCrystal_I2C lcd(0x27, 16, 2);
 
@@ -31,25 +33,31 @@ int deltaT = 0;
 int currentDelta = 0;
 int time = 15;
 
+long lastActivityTime;
+
+void wakeUp(){}
+
 void setup() {
   Serial.begin(9600);
+  
   lcd.init();
   lcd.backlight();
   randomSeed(analogRead(0));
-
   for (int i = 0; i < 4; i++) {
     pinMode(BUTTONS[i], INPUT);
     pinMode(LEDS[i], OUTPUT);
     previousButtonPressTime[i] = 0;
   }
-
   pinMode(REDLED, OUTPUT);
+  attachInterrupt(digitalPinToInterrupt(2), wakeUp, RISING);
+  lastActivityTime = millis();
 }
 
 void loop() {
   if (!isIntroDisplayed) {
     displayIntro();
   } else if (!isDifficultySelected) {
+    checkInactivity();
     selectDifficulty();
   } else if (!isGameStarted) {
     startGame();
@@ -70,12 +78,34 @@ void displayIntro() {
 }
 
 
+void checkInactivity() {
+  if (millis() - lastActivityTime >= WAKE_UP_TIME) {
+    goToSleepMode();
+  }
+}
+
+
+void goToSleepMode() {
+  lcd.print("Sleeping...")
+  Serial.flush();
+  delay(1000);
+  set_sleep_mode(SLEEP_MODE_PWR_DOWN);
+  sleep_enable();
+  sleep_mode();
+
+  Serial.println("WAKE UP");
+  sleep_disable();
+  lastActivityTime = millis();
+}
+
+
 void selectDifficulty() {
   blinkRedLed();
 
   int newPotValue = analogRead(A1);
   if(currentPotValue != newPotValue){
     currentPotValue = newPotValue;
+    lactActivityTime = millis();
     if(currentPotValue >= 0 && currentPotValue <= 256 && difficulty != 1){
       lcd.setCursor(0,2);
       lcd.print("          ");
@@ -110,6 +140,7 @@ void selectDifficulty() {
     isDifficultySelected = true;
     redLedState = LOW;
     digitalWrite(REDLED, redLedState);
+    lastActivityTime = millis();
   }
 }
 
