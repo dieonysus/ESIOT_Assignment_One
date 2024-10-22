@@ -266,13 +266,14 @@ void resetGame() {
   difficulty = 0;
   currentPotValue = 0;
   shouldDisplayNumber = true;
+  time =15;
   turnOffAllLeds();
   lastActivityTime = millis();
 }
 
 
 void no_more_time(){
-deltaT = (millis() - timeRoundStart)/1000 ;
+int deltaT = (millis() - timeRoundStart)/1000 ;
  if(currentDelta != deltaT){
     lcd.setCursor(8,0);
     lcd.print("Time:");
