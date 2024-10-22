@@ -5,15 +5,15 @@
 
 #define DEBOUNCE_TIME 200
 #define LED_BLINK_INTERVAL 500
-#define WAKE_UP_TIME 3000
+#define WAKE_UP_TIME 10000
 
-LiquidCrystal_I2C lcd(0x27, 16, 2);
+LiquidCrystal_I2C lcd(0x27, 16, 4);
 
 const int REDLED = 13;
 bool redLedState = LOW;
 long previousRedLedBlinkTime = 0;
 
-const int BUTTONS[] = {2, 3, 4, 7};
+const int BUTTONS[] = {2, 3, 4, 5};
 const int LEDS[] = {8, 9, 10, 11};
 bool ledStates[] = {LOW, LOW, LOW, LOW};
 long previousButtonPressTime[4];
@@ -33,6 +33,9 @@ unsigned long timeRoundStart = 0;
 int deltaT = 0;
 int currentDelta = 0;
 int time = 15;
+int highScore = 0;  
+int currentScore = 0; 
+
 
 long lastActivityTime;
 
@@ -48,9 +51,10 @@ void setup() {
     pinMode(BUTTONS[i], INPUT);
     pinMode(LEDS[i], OUTPUT);
     previousButtonPressTime[i] = 0;
-    enableInterrupt(BUTTONS[i], wakeUp, RISING);
+    enableInterrupt (BUTTONS[i], wakeUp, RISING);
   }
   pinMode(REDLED, OUTPUT);
+  enableInterrupt(digitalPinToInterrupt(2), wakeUp, RISING);
   lastActivityTime = millis();
 }
 
@@ -72,9 +76,13 @@ void loop() {
 
 void displayIntro() {
   lcd.clear();
+  lcd.setCursor(0, 0);
   lcd.print("Welcome to GMB!");
-  lcd.setCursor(0,1);
+  lcd.setCursor(0, 1);
   lcd.print("Press B1 to Start");
+  lcd.setCursor(0, 3);
+  lcd.print("High Score: ");
+  lcd.print(highScore);
   isIntroDisplayed = true;
 }
 
@@ -181,8 +189,13 @@ void playGame() {
     no_more_time();
     handleButtonPresses();
     if (targetNumber == convertButtonsStatesToDecimal()) {
+      currentScore++;
       lcd.clear();
+      lcd.setCursor(0, 0);
       lcd.print("Correct!");
+      lcd.setCursor(0, 1);
+      lcd.print("Score: ");
+      lcd.print(currentScore);
       delay(1000);
       shouldDisplayNumber = true;
       turnOffAllLeds();
@@ -226,9 +239,17 @@ void turnOffAllLeds() {
 
 void finishGame() {
   lcd.clear();
-  lcd.print("Game over!");
   digitalWrite(REDLED, HIGH);
   delay(1000);
+  digitalWrite(REDLED, LOW);
+  lcd.print("Game over!");
+  lcd.setCursor(0, 1);
+  lcd.print("Final Score: ");
+  lcd.print(currentScore);
+  if (currentScore > highScore) {
+    highScore = currentScore;  
+  }
+  delay(10000);
   resetGame();
 }
 
@@ -242,6 +263,7 @@ void resetGame() {
   timeRoundStart = 0;
   deltaT = 0;
   currentDelta = 0;
+  currentScore = 0;
   difficulty = 0;
   currentPotValue = 0;
   shouldDisplayNumber = true;
