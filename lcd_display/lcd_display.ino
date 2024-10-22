@@ -64,6 +64,8 @@ void loop() {
 void displayIntro() {
   lcd.clear();
   lcd.print("Welcome to GMB!");
+  lcd.setCursor(0,1);
+  lcd.print("Press B1 to Start");
   isIntroDisplayed = true;
 }
 
@@ -75,36 +77,36 @@ void selectDifficulty() {
   if(currentPotValue != newPotValue){
     currentPotValue = newPotValue;
     if(currentPotValue >= 0 && currentPotValue <= 256 && difficulty != 1){
-      lcd.setCursor(0,1);
+      lcd.setCursor(0,2);
       lcd.print("          ");
-      lcd.setCursor(0,1);
+      lcd.setCursor(0,2);
       lcd.print(" :) EASY");
       difficulty = 1;
       time = 15;
     }else if(currentPotValue > 256 && currentPotValue <= 512 && difficulty != 2){
-      lcd.setCursor(0,1);
+      lcd.setCursor(0,2);
       lcd.print("          ");
-      lcd.setCursor(0,1);
+      lcd.setCursor(0,2);
       lcd.print(" :| MEDIUM");
       difficulty = 2;
       time = 10;
     }else if(currentPotValue > 512 && currentPotValue <= 768 && difficulty != 3){
-      lcd.setCursor(0,1);
+      lcd.setCursor(0,2);
       lcd.print("          ");
-      lcd.setCursor(0,1);
+      lcd.setCursor(0,2);
       lcd.print(">:) HARD");
       difficulty = 3;
       time = 7;
     }else if(currentPotValue > 768 && difficulty != 4){
-      lcd.setCursor(0,1);
+      lcd.setCursor(0,2);
       lcd.print("          ");
-      lcd.setCursor(0,1);
+      lcd.setCursor(0,2);
       lcd.print(">:D EXPERT");
       difficulty = 4;
       time = 5;
     }
   }
-  if (digitalRead(BUTTONS[0])) {
+  if (digitalRead(BUTTONS[3])) {
     isDifficultySelected = true;
     redLedState = LOW;
     digitalWrite(REDLED, redLedState);
@@ -141,6 +143,9 @@ void playGame() {
     no_more_time();
     handleButtonPresses();
     if (targetNumber == convertButtonsStatesToDecimal()) {
+      lcd.clear();
+      lcd.print("Correct!");
+      delay(1000);
       shouldDisplayNumber = true;
       turnOffAllLeds();
       time = time - (time*0.05);
