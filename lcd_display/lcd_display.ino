@@ -1,7 +1,8 @@
 #include <LiquidCrystal_I2C.h>
 #include <Wire.h>
 #include <avr/sleep.h>
-
+#include <EnableInterrupt.h>
+// I am going insane
 #define DEBOUNCE_TIME 200
 #define LED_BLINK_INTERVAL 500
 #define WAKE_UP_TIME 10000
@@ -50,9 +51,10 @@ void setup() {
     pinMode(BUTTONS[i], INPUT);
     pinMode(LEDS[i], OUTPUT);
     previousButtonPressTime[i] = 0;
+    enableInterrupt (BUTTONS[i], wakeUp, RISING);
   }
   pinMode(REDLED, OUTPUT);
-  attachInterrupt(digitalPinToInterrupt(2), wakeUp, RISING);
+  enableInterrupt(digitalPinToInterrupt(2), wakeUp, RISING);
   lastActivityTime = millis();
 }
 
@@ -93,7 +95,8 @@ void checkInactivity() {
 
 
 void goToSleepMode() {
-  lcd.print("Sleeping...")
+  lcd.clear();
+  lcd.print("Sleeping...");
   Serial.flush();
   delay(1000);
   set_sleep_mode(SLEEP_MODE_PWR_DOWN);
@@ -103,6 +106,9 @@ void goToSleepMode() {
   Serial.println("WAKE UP");
   sleep_disable();
   lastActivityTime = millis();
+
+  displayIntro();
+  delay(1000);
 }
 
 
@@ -112,7 +118,6 @@ void selectDifficulty() {
   int newPotValue = analogRead(A1);
   if(currentPotValue != newPotValue){
     currentPotValue = newPotValue;
-    lactActivityTime = millis();
     if(currentPotValue >= 0 && currentPotValue <= 256 && difficulty != 1){
       lcd.setCursor(0,2);
       lcd.print("          ");
