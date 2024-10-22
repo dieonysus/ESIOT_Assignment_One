@@ -6,7 +6,7 @@
 #define LED_BLINK_INTERVAL 500
 #define WAKE_UP_TIME 10000
 
-LiquidCrystal_I2C lcd(0x27, 16, 2);
+LiquidCrystal_I2C lcd(0x27, 16, 4);
 
 const int REDLED = 13;
 bool redLedState = LOW;
@@ -32,6 +32,9 @@ unsigned long timeRoundStart = 0;
 int deltaT = 0;
 int currentDelta = 0;
 int time = 15;
+int highScore = 0;  
+int currentScore = 0; 
+
 
 long lastActivityTime;
 
@@ -71,9 +74,13 @@ void loop() {
 
 void displayIntro() {
   lcd.clear();
+  lcd.setCursor(0, 0);
   lcd.print("Welcome to GMB!");
-  lcd.setCursor(0,1);
+  lcd.setCursor(0, 1);
   lcd.print("Press B1 to Start");
+  lcd.setCursor(0, 3);
+  lcd.print("High Score: ");
+  lcd.print(highScore);
   isIntroDisplayed = true;
 }
 
@@ -174,8 +181,13 @@ void playGame() {
     no_more_time();
     handleButtonPresses();
     if (targetNumber == convertButtonsStatesToDecimal()) {
+      currentScore++;
       lcd.clear();
+      lcd.setCursor(0, 0);
       lcd.print("Correct!");
+      lcd.setCursor(0, 1);
+      lcd.print("Score: ");
+      lcd.print(currentScore);
       delay(1000);
       shouldDisplayNumber = true;
       turnOffAllLeds();
@@ -220,6 +232,12 @@ void turnOffAllLeds() {
 void finishGame() {
   lcd.clear();
   lcd.print("Game over!");
+  lcd.setCursor(0, 1);
+  lcd.print("Final Score: ");
+  lcd.print(currentScore);
+  if (currentScore > highScore) {
+    highScore = currentScore;  
+  }
   digitalWrite(REDLED, HIGH);
   delay(1000);
   resetGame();
@@ -235,6 +253,7 @@ void resetGame() {
   timeRoundStart = 0;
   deltaT = 0;
   currentDelta = 0;
+  currentScore = 0;
   difficulty = 0;
   currentPotValue = 0;
   shouldDisplayNumber = true;
