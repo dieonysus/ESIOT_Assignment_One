@@ -4,7 +4,7 @@
 #define DEBOUNCE_TIME 200
 #define LED_BLINK_INTERVAL 500
 
-LiquidCrystal_I2C lcd(0x27, 20, 4);
+LiquidCrystal_I2C lcd(0x27, 16, 2);
 
 const int REDLED = 13;
 bool redLedState = LOW;
@@ -27,9 +27,9 @@ bool shouldDisplayNumber = true;
 int targetNumber = 0;
 
 unsigned long timeRoundStart = 0;
+int deltaT = 0;
 int currentDelta = 0;
 int time = 15;
-int F = 0;
 
 void setup() {
   Serial.begin(9600);
@@ -77,29 +77,33 @@ void selectDifficulty() {
   if(currentPotValue != newPotValue){
     currentPotValue = newPotValue;
     if(currentPotValue >= 0 && currentPotValue <= 256 && difficulty != 1){
+      lcd.setCursor(0,2);
+      lcd.print("          ");
+      lcd.setCursor(0,2);
+      lcd.print(" :) EASY");
       difficulty = 1;
-      lcd.setCursor(5,3);
-      lcd.print("Level: ");
-      lcd.print(difficulty);
-      F = 0.05;
+      time = 15;
     }else if(currentPotValue > 256 && currentPotValue <= 512 && difficulty != 2){
+      lcd.setCursor(0,2);
+      lcd.print("          ");
+      lcd.setCursor(0,2);
+      lcd.print(" :| MEDIUM");
       difficulty = 2;
-      lcd.setCursor(5,3);
-      lcd.print("Level: ");
-      lcd.print(difficulty);
-      F = 0.15;
+      time = 10;
     }else if(currentPotValue > 512 && currentPotValue <= 768 && difficulty != 3){
+      lcd.setCursor(0,2);
+      lcd.print("          ");
+      lcd.setCursor(0,2);
+      lcd.print(">:) HARD");
       difficulty = 3;
-      lcd.setCursor(5,3);
-      lcd.print("Level: ");
-      lcd.print(difficulty);
-      F = 0.27;
+      time = 7;
     }else if(currentPotValue > 768 && difficulty != 4){
+      lcd.setCursor(0,2);
+      lcd.print("          ");
+      lcd.setCursor(0,2);
+      lcd.print(">:D EXPERT");
       difficulty = 4;
-      lcd.setCursor(5,3);
-      lcd.print("Level: ");
-      lcd.print(difficulty);
-      F = 0.5;
+      time = 5;
     }
   }
   if (digitalRead(BUTTONS[3])) {
@@ -144,7 +148,8 @@ void playGame() {
       delay(1000);
       shouldDisplayNumber = true;
       turnOffAllLeds();
-      time = time - (time*F);
+      time = time - (time*0.05);
+      deltaT = 0;
       currentDelta = 0;
     }
   }
@@ -197,17 +202,17 @@ void resetGame() {
   isGameStarted = false;
   isGameOver = false;
   timeRoundStart = 0;
+  deltaT = 0;
   currentDelta = 0;
   difficulty = 0;
   currentPotValue = 0;
   shouldDisplayNumber = true;
-  time = 15;
   turnOffAllLeds();
 }
 
 
 void no_more_time(){
-int deltaT = (millis() - timeRoundStart)/1000 ;
+deltaT = (millis() - timeRoundStart)/1000 ;
  if(currentDelta != deltaT){
     lcd.setCursor(8,0);
     lcd.print("Time:");
