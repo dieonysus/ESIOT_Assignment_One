@@ -36,7 +36,7 @@ int time = 15;
 int highScore = 0;  
 int currentScore = 0; 
 
-
+int F = 0;
 long lastActivityTime;
 
 void wakeUp(){}
