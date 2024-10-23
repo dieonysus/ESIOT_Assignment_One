@@ -98,6 +98,7 @@ void goToSleepMode() {
   lcd.clear();
   lcd.print("Sleeping...");
   Serial.flush();
+  digitalWrite(REDLED, LOW);
   delay(1000);
   set_sleep_mode(SLEEP_MODE_PWR_DOWN);
   sleep_enable();
@@ -124,7 +125,7 @@ void selectDifficulty() {
       lcd.setCursor(0,2);
       lcd.print(" :) EASY");
       difficulty = 1;
-      F = 5;
+      F = 10;
     }else if(currentPotValue > 256 && currentPotValue <= 512 && difficulty != 2){
       lastActivityTime = millis();
       lcd.setCursor(0,2);
