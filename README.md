@@ -2,11 +2,28 @@
 
 ## Table of Contents 
 - [Overview](#overview)
+- [How to Play](#how-to-play)
 - [How It Works](#how-it-works)
 
 ## Overview 
 
 Get My Binary is an arduino based game designed to test a player's ability to translate decimal numbers to binary under a time contraint. The game consists of multiple rounds and it will generate a random number between 1 and 15 and the player's goal is to represent that number using binary. The game increases in difficulty with each round by decreasing the allowed response time, creating a fast-paced and challenging experience.
+
+## How to Play
+
+1. Choose the difficult by turning the potentiometer. The game offers four difficulty levels: Easy, Medium, Hard and Expert. The levels affect the time limit of your response. 
+
+2. Press the leftmost button to begin the game 
+
+3. Input your binary answer by pressing the button. Each button corresponds to a green LED light. 
+    - Button 1 (leftmost): represents the most significant bit. 
+    - Button 4 (rightmost): represents the least significant bit.
+4. The LEDS will indicate of you set a bit to 1. 
+    - If the LED is turned on it represents 1. 
+5. Correct answers will be acknowledged and you will move to the next round in which the time will decrease. If you do not provide the answer during the time given the game is over.
+
+6. Once the game is over you will see your score. If the score is greater than the previous highscore arduino will show it on the main menu. 
+
 
 ## How it Works
 
