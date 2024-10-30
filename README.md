@@ -6,6 +6,7 @@
 - [How It Works](#how-it-works)
 - [Libraries Used](#libraries-used)
 - [Key Constants and Variables](#key-constants-and-variables)
+- [Game Setup](#game-setup-setup)
 ## Overview 
 
 Get My Binary is an arduino based game designed to test a player's ability to translate decimal numbers to binary under a time contraint. The game consists of multiple rounds and it will generate a random number between 1 and 15 and the player's goal is to represent that number using binary. The game increases in difficulty with each round by decreasing the allowed response time, creating a fast-paced and challenging experience.
@@ -71,7 +72,14 @@ The player's final score is then displayed on the LCD.
 - `WAKE_UP_TIME`: Sets an inactivity period of 10 seconds before the device goes to sleep.
 - **LCD Address**: Sets up the LCD screen with I2C address 0x27, 16 columns, and 4 rows.
 - **REDLED (pin 13)**: Controls a red LED that indicates system states.
-- `LEDS[]`: List taht includes the pins of the green LED lights (can be changed based on your setup).
-- `BUTTONS[]`: List that includes the pins of the buttons (can be changed based on your setup) that are used to change status of LED lights.
+- `LEDS[]`: An array that includes the pins of the green LED lights (can be changed based on your setup).
+- `BUTTONS[]`: An array that includes the pins of the buttons (can be changed based on your setup) that are used to change status of LED lights.
 - **Game States**: `isIntroDisplayed`, `isDifficultySelected`, `isGameStarted`, `isGameOver`, etc., keep track of where the user is in the game flow.
 - **Score Variables**: `currentScore` and `highScore` store the user’s score for the current round and highest score achieved.
+
+## Game Setup (`setup()`)
+- Initializes serial communication for debugging.
+- Sets up the LCD, activates the backlight, and seeds the random number generator.
+- Configures each button in the `BUTTONS` array as an input and each `LED` in LEDS as an output.
+- Enables interrupts for each button to wake up the microcontroller from sleep when pressed.
+- Initializes the last activity time to detect inactivity.
