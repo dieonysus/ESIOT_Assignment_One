@@ -5,7 +5,7 @@
 - [How to Play](#how-to-play)
 - [How It Works](#how-it-works)
 - [Libraries Used](#libraries-used)
-
+- [Key Constants and Variables](#key-constants-and-variables)
 ## Overview 
 
 Get My Binary is an arduino based game designed to test a player's ability to translate decimal numbers to binary under a time contraint. The game consists of multiple rounds and it will generate a random number between 1 and 15 and the player's goal is to represent that number using binary. The game increases in difficulty with each round by decreasing the allowed response time, creating a fast-paced and challenging experience.
@@ -63,3 +63,15 @@ The player's final score is then displayed on the LCD.
 1. **LiquidCrystal_I2Ch** and **Wire.h**: used to control LCD that is I2C controlled.
 2. **avr/sleep.h**: used for sleep mode for power saving purposes.
 3. **EnableEnableInterrupt.h**: Enables handling of button interrupts for responsive button presses and sleep-wake functionality.
+
+## Key Constants and Variables
+
+- `DEBOUNCE_TIME`: Used to prevent multiple triggers from a single button press by waiting 200 ms between reads.
+- `LED_BLINK_INTERVAL`: Controls the blinking interval for the red LED (500 ms).
+- `WAKE_UP_TIME`: Sets an inactivity period of 10 seconds before the device goes to sleep.
+- **LCD Address**: Sets up the LCD screen with I2C address 0x27, 16 columns, and 4 rows.
+- **REDLED (pin 13)**: Controls a red LED that indicates system states.
+- `LEDS[]`: List taht includes the pins of the green LED lights (can be changed based on your setup).
+- `BUTTONS[]`: List that includes the pins of the buttons (can be changed based on your setup) that are used to change status of LED lights.
+- **Game States**: `isIntroDisplayed`, `isDifficultySelected`, `isGameStarted`, `isGameOver`, etc., keep track of where the user is in the game flow.
+- **Score Variables**: `currentScore` and `highScore` store the user’s score for the current round and highest score achieved.
