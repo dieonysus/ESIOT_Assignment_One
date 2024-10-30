@@ -2,6 +2,7 @@
 
 ## Table of Contents 
 - [Overview](#overview)
+- [Schema](#schema)
 - [How to Play](#how-to-play)
 - [How It Works](#how-it-works)
 - [Libraries Used](#libraries-used)
@@ -12,6 +13,10 @@
 ## Overview 
 
 Get My Binary is an arduino based game designed to test a player's ability to translate decimal numbers to binary under a time contraint. The game consists of multiple rounds and it will generate a random number between 1 and 15 and the player's goal is to represent that number using binary. The game increases in difficulty with each round by decreasing the allowed response time, creating a fast-paced and challenging experience.
+
+## Schema
+![Schema](ESIOT-ASSIGNMENT_1-Schema.png)
+*Circuit diagram for setting up the buttons and LEDs for the game.*
 
 ## How to Play
 
