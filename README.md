@@ -7,6 +7,7 @@
 - [Libraries Used](#libraries-used)
 - [Key Constants and Variables](#key-constants-and-variables)
 - [Game Setup](#game-setup-setup)
+- [Game Flow](#game-flow-loop)
 ## Overview 
 
 Get My Binary is an arduino based game designed to test a player's ability to translate decimal numbers to binary under a time contraint. The game consists of multiple rounds and it will generate a random number between 1 and 15 and the player's goal is to represent that number using binary. The game increases in difficulty with each round by decreasing the allowed response time, creating a fast-paced and challenging experience.
@@ -83,3 +84,13 @@ The player's final score is then displayed on the LCD.
 - Configures each button in the `BUTTONS` array as an input and each `LED` in LEDS as an output.
 - Enables interrupts for each button to wake up the microcontroller from sleep when pressed.
 - Initializes the last activity time to detect inactivity.
+
+## Game Flow (`loop()`)
+
+The game operates in a sequence of states or stages:
+
+1. **Intro Display**: Shows a welcome message and the current high score.
+2. **Difficulty Selection**: Allows players to set a difficulty level via a potentiometer.
+3. **Game Start**: Displays a "Get ready!" message and initiates gameplay.
+4. **Gameplay**: Displays a target number that players must match by pressing button combinations.
+5. **Game Over**: Displays the final score, updates the high score if applicable, and resets the game.
