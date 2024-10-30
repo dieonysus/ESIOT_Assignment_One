@@ -4,6 +4,7 @@
 - [Overview](#overview)
 - [How to Play](#how-to-play)
 - [How It Works](#how-it-works)
+- [Libraries Used](#libraries-used)
 
 ## Overview 
 
@@ -56,3 +57,9 @@ If the player fails to complete the binary configuration within the time limit, 
 
 
 The player's final score is then displayed on the LCD. 
+
+
+## Libraries Used
+1. **LiquidCrystal_I2Ch** and **Wire.h**: used to control LCD that is I2C controlled.
+2. **avr/sleep.h**: used for sleep mode for power saving purposes.
+3. **EnableEnableInterrupt.h**: Enables handling of button interrupts for responsive button presses and sleep-wake functionality.
