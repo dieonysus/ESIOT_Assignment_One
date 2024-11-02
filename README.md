@@ -16,7 +16,7 @@ Get My Binary is an arduino based game designed to test a player's ability to tr
 
 ## Schema
 ![Schema](ESIOT-ASSIGNMENT_1-Schema.png)
-*Circuit diagram for setting up the buttons and LEDs for the game.*
+*Circuit diagram for setting up the buttons, LEDs, LCD and potentiometer*
 
 ## How to Play
 
